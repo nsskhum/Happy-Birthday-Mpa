@@ -1,0 +1,200 @@
+// JAVASCRIPT UNTUK KONTROL MUSIK
+        class SimpleMusicPlayer {
+            constructor() {
+                this.audio = document.getElementById('birthdayAudio');
+                this.playBtn = document.getElementById('playBtn');
+                this.volumeSlider = document.getElementById('volumeSlider');
+                this.isPlaying = false;
+                
+                this.initPlayer();
+            }
+
+            initPlayer() {
+                // Set volume awal
+                this.audio.volume = 0.6;
+                
+                // Event listeners
+                this.playBtn.addEventListener('click', () => this.togglePlay());
+                this.volumeSlider.addEventListener('input', (e) => {
+                    this.audio.volume = e.target.value / 100;
+                });
+                
+                // Audio events
+                this.audio.addEventListener('play', () => {
+                    this.playBtn.innerHTML = '⏸';
+                    document.body.classList.add('music-playing');
+                    this.startMusicNotes();
+                });
+                
+                this.audio.addEventListener('pause', () => {
+                    this.playBtn.innerHTML = '▶';
+                    document.body.classList.remove('music-playing');
+                    this.stopMusicNotes();
+                });
+
+                this.audio.addEventListener('error', () => {
+                    console.log('File musik tidak ditemukan');
+                    this.playBtn.innerHTML = '❌';
+                });
+
+                // Auto-play setelah 2 detik
+                setTimeout(() => {
+                    this.tryAutoPlay();
+                }, 2000);
+            }
+
+            togglePlay() {
+                if (this.isPlaying) {
+                    this.audio.pause();
+                    this.isPlaying = false;
+                } else {
+                    this.audio.play().then(() => {
+                        this.isPlaying = true;
+                    }).catch(e => {
+                        console.log('Tidak bisa autoplay:', e);
+                    });
+                }
+            }
+
+            tryAutoPlay() {
+                // Coba autoplay, jika gagal biarkan user yang klik
+                this.audio.play().then(() => {
+                    this.isPlaying = true;
+                }).catch(() => {
+                    // Autoplay diblokir browser, tidak apa-apa
+                    console.log('Autoplay diblokir, user harus klik play');
+                });
+            }
+
+            startMusicNotes() {
+                const notes = document.querySelectorAll('.music-note');
+                notes.forEach(note => {
+                    note.style.animationPlayState = 'running';
+                });
+            }
+
+            stopMusicNotes() {
+                const notes = document.querySelectorAll('.music-note');
+                notes.forEach(note => {
+                    note.style.animationPlayState = 'paused';
+                });
+            }
+        }
+
+        // Inisialisasi player ketika halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            new SimpleMusicPlayer();
+        });
+
+        // Tambahan: Click effect sederhana
+        document.addEventListener('click', (e) => {
+            // Buat efek sparkle kecil saat klik
+            const sparkle = document.createElement('div');
+            sparkle.innerHTML = '✨';
+            sparkle.style.cssText = `
+                position: fixed;
+                left: ${e.clientX}px;
+                top: ${e.clientY}px;
+                font-size: 12px;
+                pointer-events: none;
+                z-index: 9999;
+                animation: sparkle 1s ease-out forwards;
+            `;
+            
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => {
+                document.body.removeChild(sparkle);
+            }, 1000);
+        });
+
+        // CSS animation untuk sparkle effect
+        const sparkleStyle = document.createElement('style');
+        sparkleStyle.textContent = `
+            @keyframes sparkle {
+                0% {
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-30px) scale(0.5);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(sparkleStyle);
+
+    // POPUP FUNCTIONALITY
+    function showBirthdayPopup() {
+            const popup = document.getElementById('birthdayPopup');
+            popup.classList.add('show');
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('birthdayPopup');
+            popup.classList.remove('show');
+        }
+
+        // CAKE EMOJI EFFECT
+        function createCakeEmoji(x, y) {
+            const cakeEmojis = ['🎂', '🧁', '🍰', '🎂', '🧁'];
+            const randomCake = cakeEmojis[Math.floor(Math.random() * cakeEmojis.length)];
+            
+            const cake = document.createElement('div');
+            cake.innerHTML = randomCake;
+            cake.className = 'cake-emoji';
+            cake.style.left = x + 'px';
+            cake.style.top = y + 'px';
+            
+            document.body.appendChild(cake);
+            
+            setTimeout(() => {
+                if (document.body.contains(cake)) {
+                    document.body.removeChild(cake);
+                }
+            }, 2000);
+        }
+
+        // Inisialisasi ketika halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            new SimpleMusicPlayer();
+            
+            // Show popup after 2 seconds
+            setTimeout(() => {
+                showBirthdayPopup();
+            }, 2000);
+        });
+
+        // Enhanced click effect dengan cake emoji
+        document.addEventListener('click', (e) => {
+            // Buat efek sparkle kecil saat klik
+            const sparkle = document.createElement('div');
+            sparkle.innerHTML = '✨';
+            sparkle.style.cssText = `
+                position: fixed;
+                left: ${e.clientX}px;
+                top: ${e.clientY}px;
+                font-size: 12px;
+                pointer-events: none;
+                z-index: 9999;
+                animation: sparkle 1s ease-out forwards;
+            `;
+            
+            document.body.appendChild(sparkle);
+            
+            // Tambahkan cake emoji effect
+            createCakeEmoji(e.clientX - 15, e.clientY - 15);
+            
+            setTimeout(() => {
+                if (document.body.contains(sparkle)) {
+                    document.body.removeChild(sparkle);
+                }
+            }, 1000);
+        });
+
+        // Close popup when clicking outside
+        document.getElementById('birthdayPopup').addEventListener('click', (e) => {
+            if (e.target.classList.contains('popup-overlay')) {
+                closePopup();
+            }
+        });
